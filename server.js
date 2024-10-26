@@ -8,10 +8,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 
+const allowedOrigins = ['https://youtube-video-render.onrender.com']; // List of allowed origins
 app.use(cors({
-  origin: '*', // Allow requests from all origins
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Serve the HTML file
