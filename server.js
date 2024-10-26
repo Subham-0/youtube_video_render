@@ -1,19 +1,11 @@
 const express = require('express');
 const axios = require('axios');
-const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-
-const allowedOrigins = ['https://youtube-video-render.onrender.com']; // List of allowed origins
-app.use(cors({
-    origin: allowedOrigins,
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
 
 // Serve the HTML file
 app.use(express.static(path.join(__dirname, 'public')));
