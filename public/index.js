@@ -10,8 +10,10 @@ async function getVideoDetails() {
     try{
    
 
-    const response = await fetch(`http://localhost:3000/video/details?videoId=${videoId}`);
-    
+        const response = await fetch(`https://youtube-downloader.onrender.com/video/details?videoId=${videoId}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
     
     const data = await response.json();
     

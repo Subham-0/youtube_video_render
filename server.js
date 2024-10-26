@@ -7,7 +7,12 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+
+app.use(cors({
+  origin: '*', // Allow requests from all origins
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Serve the HTML file
 app.use(express.static(path.join(__dirname, 'public')));
