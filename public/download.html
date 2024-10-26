@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Video</title>
+</head>
+<body>
+    <h1>Download Video</h1>
+    <div id="downloadLinks"></div>
+    <script>
+        // Assuming data is passed via URL or local storage
+        const params = new URLSearchParams(window.location.search);
+        const videoData = JSON.parse(decodeURIComponent(params.get('data')));
+
+        const downloadLinksDiv = document.getElementById('downloadLinks');
+
+        // Create download links for videos and audios
+        if (videoData.videos.items) {
+            videoData.videos.items.forEach(video => {
+                const link = document.createElement('a');
+                link.href = video.url;
+                link.textContent = `Download ${video.quality} Video`;
+                link.target = '_blank';
+                downloadLinksDiv.appendChild(link);
+                downloadLinksDiv.appendChild(document.createElement('br'));
+            });
+        }
+
+        if (videoData.audios.items) {
+            videoData.audios.items.forEach(audio => {
+                const link = document.createElement('a');
+                link.href = audio.url; // Adjust accordingly based on your audio data structure
+                link.textContent = `Download Audio`;
+                link.target = '_blank';
+                downloadLinksDiv.appendChild(link);
+                downloadLinksDiv.appendChild(document.createElement('br'));
+            });
+        }
+    </script>
+</body>
+</html>
