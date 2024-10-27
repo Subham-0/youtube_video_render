@@ -1,29 +1,39 @@
 async function getVideoDetails() {
     const videoUrl = document.getElementById('videoUrl').value;
 
+ // Show loading message
+ const loadingMessage = document.getElementById('loadingMessage');
+ loadingMessage.style.display = 'block';
+
+ // Clear previous results
+ document.getElementById('result').innerHTML = '';
+
     // Extract the video ID from the URL
     const videoId = extractVideoId(videoUrl);
     if (!videoId) {
         document.getElementById('result').innerText = 'Invalid YouTube URL';
+        loadingMessage.style.display = 'none';
         return;
     }
 
      // Use the current origin as the base URL
      const baseUrl = window.location.origin;
-
-
+     loadingMessage.style.display = 'block';
     try{
         const response = await fetch(`${baseUrl}/video/details?videoId=${videoId}`);
-
-        //const response = await fetch(`https://youtube-video-render.onrender.com/video/details?videoId=${videoId}`);
-    
-     const data = await response.json();
+        const data = await response.json();
     
     // Display video and audio data
     displayData(data);
+
+    document.getElementById('result').style.display = 'block';
 } catch (error) {
     console.error('Error fetching video details:', error);
     document.getElementById('result').innerText = 'Failed to load video details. Please try again later.';
+}
+finally {
+    // Hide loading message
+    loadingMessage.style.display = 'none';
 }
 }
 
@@ -38,9 +48,14 @@ function displayData(data) {
         const firstVideo = videos.items[0]; // Get the first video
         const downloadVideoLink = firstVideo.url;
 
-        resultHtml += `<h3>First Video:</h3>`;
-        resultHtml += `<p>${firstVideo.quality} - <a href="${downloadVideoLink}" target="_blank">Download Video</a></p>`;
-        
+        resultHtml += `
+         <h3>Video:</h3>
+        <p class="media-details">
+            <span>${firstVideo.sizeText}</span>
+            <a href="#" onclick="downloadFile('${downloadVideoLink}'); return false;">Download Video</a>
+        </p>
+    `;
+    
         // Automatically download the first video
         //window.location.href = downloadVideoLink; // Start download immediately
     } else {
@@ -52,9 +67,14 @@ function displayData(data) {
         const firstAudio = audios.items[0]; // Get the first audio
         const downloadAudioLink = firstAudio.url; // Ensure this is correct based on your audio data structure
 
-        resultHtml += `<h3>First Audio:</h3>`;
-        resultHtml += `<p><a href="${downloadAudioLink}" target="_blank">Download Audio</a></p>`;
-        
+        resultHtml += `
+        <h3>Audio:</h3>
+        <p class="media-details">
+            <span>${firstAudio.sizeText}</span>
+            <a href="#" onclick="downloadFile('${downloadAudioLink}'); return false;">Download Audio</a>
+        </p>
+    `;
+   
         // Automatically download the first audio
         // window.open(downloadAudioLink, '_blank'); // Start download in a new tab
     } else {
@@ -76,3 +96,25 @@ function extractVideoId(url) {
     const match = url.match(regex);
     return match ? match[1] : null; // Return the video ID or null if not found
 }
+
+async function downloadFile(url) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Failed to download file');
+        }
+        const blob = await response.blob(); // Convert the response to a blob
+        const downloadUrl = window.URL.createObjectURL(blob); // Create a URL for the blob
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = ''; // Optionally set a file name
+        document.body.appendChild(a);
+        a.click(); // Trigger the download
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(downloadUrl); // Clean up the URL after the download
+    } catch (error) {
+        console.error('Download failed:', error);
+    }
+}
+
+

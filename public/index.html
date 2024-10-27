@@ -7,10 +7,16 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>YouTube Video Details</h1>
+    <h1>YouTube Downloader</h1>
+    <p>Download youtube video and audio in a single platform</p>
     <input type="text" id="videoUrl" placeholder="Enter YouTube Video URL" />
     <button onclick="getVideoDetails()">Get Details</button>
+    <p id="loadingMessage" style="text-align: center; display: none;">Please wait a few seconds...</p>
     <div id="result"></div>
+    
+    <footer>
+        &copy; @subham All rights reserved
+    </footer>
     <script src="index.js"></script>
 </body>
 </html>
