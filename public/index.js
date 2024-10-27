@@ -7,14 +7,17 @@ async function getVideoDetails() {
         document.getElementById('result').innerText = 'Invalid YouTube URL';
         return;
     }
-    try{
-   
 
-    const response = await fetch(`http://localhost:3000/video/details?videoId=${videoId}`);
+     // Use the current origin as the base URL
+     const baseUrl = window.location.origin;
+
+
+    try{
+        const response = await fetch(`${baseUrl}/video/details?videoId=${videoId}`);
+
+        //const response = await fetch(`https://youtube-video-render.onrender.com/video/details?videoId=${videoId}`);
     
-    
-    const data = await response.json();
-    
+     const data = await response.json();
     
     // Display video and audio data
     displayData(data);
