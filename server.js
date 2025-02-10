@@ -7,19 +7,12 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Enable CORS
+app.use(cors());
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*'); // Allow all origins, or specify your domain
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  next();
-});
-
-
-
-// Serve the HTML file
 app.use(express.static(path.join(__dirname, 'public')));
 
+// API to fetch video details
 app.get('/video/details', async (req, res) => {
   const videoId = req.query.videoId;
 
@@ -32,23 +25,31 @@ app.get('/video/details', async (req, res) => {
       audios: 'true'
     },
     headers: {
-      'x-rapidapi-key': process.env.RAPIDAPI_KEY, // Replace with your RapidAPI key
-      'x-rapidapi-host':process.env.RAPIDAPI_HOST
+      'x-rapidapi-key': process.env.RAPIDAPI_KEY,
+      'x-rapidapi-host': process.env.RAPIDAPI_HOST
     }
   };
 
   try {
     const response = await axios.request(options);
-    console.log(response.data); // Log the entire response for debugging
-
-    // Return only the video and audio data
-    const { videos, audios } = response.data;
-
-    res.json({ videos, audios });
+    res.json(response.data);
   } catch (error) {
     console.error(error);
     res.status(500).send('Error fetching video details');
   }
+});
+
+// 🔹 Proxy video download request to bypass CORS issues
+app.get('/proxy', async (req, res) => {
+    const videoUrl = req.query.url;
+    try {
+        const response = await axios.get(videoUrl, { responseType: 'stream' });
+
+        res.setHeader("Content-Type", "video/mp4");
+        response.data.pipe(res);
+    } catch (error) {
+        res.status(500).send("Failed to fetch video.");
+    }
 });
 
 app.listen(PORT, () => {

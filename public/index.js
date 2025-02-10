@@ -43,46 +43,41 @@ function displayData(data) {
 
     let resultHtml = "<h2>Video and Audio Details</h2>";
 
-    // Check if videos are available
+    // Video Section
     if (videos && videos.items && videos.items.length > 0) {
-        const firstVideo = videos.items[0]; // Get the first video
+        const firstVideo = videos.items[0]; 
         const downloadVideoLink = firstVideo.url;
 
         resultHtml += `
-         <h3>Video:</h3>
+        <h3>Video:</h3>
         <p class="media-details">
             <span>${firstVideo.sizeText}</span>
-            <a href="#" onclick="downloadFile('${downloadVideoLink}'); return false;">Download Video</a>
+            <a href="#" onclick="downloadFile('${downloadVideoLink}', 'video'); return false;">Download Video</a>
         </p>
     `;
-    
-        // Automatically download the first video
-        //window.location.href = downloadVideoLink; // Start download immediately
     } else {
         resultHtml += "<p>No video data available.</p>";
     }
 
-    // Check if audios are available
+    // Audio Section
     if (audios && audios.items && audios.items.length > 0) {
-        const firstAudio = audios.items[0]; // Get the first audio
-        const downloadAudioLink = firstAudio.url; // Ensure this is correct based on your audio data structure
+        const firstAudio = audios.items[0]; 
+        const downloadAudioLink = firstAudio.url; 
 
         resultHtml += `
         <h3>Audio:</h3>
         <p class="media-details">
             <span>${firstAudio.sizeText}</span>
-            <a href="#" onclick="downloadFile('${downloadAudioLink}'); return false;">Download Audio</a>
+            <a href="#" onclick="downloadFile('${downloadAudioLink}', 'audio'); return false;">Download Audio</a>
         </p>
     `;
-   
-        // Automatically download the first audio
-        // window.open(downloadAudioLink, '_blank'); // Start download in a new tab
     } else {
         resultHtml += "<p>No audio data available.</p>";
     }
 
     document.getElementById('result').innerHTML = resultHtml;
 }
+
 // Function to redirect to the download page
 function redirectToDownloadPage(videoData) {
     const data = encodeURIComponent(JSON.stringify(videoData)); // Encode data for URL
@@ -97,24 +92,27 @@ function extractVideoId(url) {
     return match ? match[1] : null; // Return the video ID or null if not found
 }
 
-async function downloadFile(url) {
+async function downloadFile(url, type) {
     try {
-        const response = await fetch(url);
+        const proxyUrl = `http://localhost:3000/proxy?url=${encodeURIComponent(url)}`;
+        const response = await fetch(proxyUrl);
         if (!response.ok) {
             throw new Error('Failed to download file');
         }
-        const blob = await response.blob(); // Convert the response to a blob
-        const downloadUrl = window.URL.createObjectURL(blob); // Create a URL for the blob
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
+        
+        // Set correct filename and extension
         a.href = downloadUrl;
-        a.download = ''; // Optionally set a file name
+        a.download = type === 'audio' ? 'audio.mp3' : 'video.mp4';  
+        
         document.body.appendChild(a);
-        a.click(); // Trigger the download
+        a.click();
         document.body.removeChild(a);
-        window.URL.revokeObjectURL(downloadUrl); // Clean up the URL after the download
+        window.URL.revokeObjectURL(downloadUrl);
     } catch (error) {
         console.error('Download failed:', error);
     }
 }
-
 
