@@ -41,16 +41,20 @@ app.get('/video/details', async (req, res) => {
 
 // 🔹 Proxy video download request to bypass CORS issues
 app.get('/proxy', async (req, res) => {
-    const videoUrl = req.query.url;
-    try {
-        const response = await axios.get(videoUrl, { responseType: 'stream' });
+  const videoUrl = req.query.url;
+  try {
+      const response = await axios.get(videoUrl, { responseType: 'stream' });
 
-        res.setHeader("Content-Type", "video/mp4");
-        response.data.pipe(res);
-    } catch (error) {
-        res.status(500).send("Failed to fetch video.");
-    }
+      res.setHeader("Access-Control-Allow-Origin", "*");  // Allow all origins
+      res.setHeader("Content-Disposition", "attachment; filename=download.mp4");  // Force download
+      res.setHeader("Content-Type", "video/mp4");
+
+      response.data.pipe(res);
+  } catch (error) {
+      res.status(500).send("Failed to fetch video.");
+  }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
