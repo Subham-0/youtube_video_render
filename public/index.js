@@ -101,18 +101,20 @@ async function downloadFile(url, type) {
         }
         const blob = await response.blob();
         const downloadUrl = window.URL.createObjectURL(blob);
+
+        // Open in a new tab (better for mobile)
         const a = document.createElement('a');
-        
-        // Set correct filename and extension
         a.href = downloadUrl;
+        a.target = '_blank';  // Open in new tab
+        a.rel = 'noopener noreferrer';
         a.download = type === 'audio' ? 'audio.mp3' : 'video.mp4';  
-        
+
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(downloadUrl);
     } catch (error) {
         console.error('Download failed:', error);
+        alert('Download failed. Try opening in desktop mode.');
     }
 }
-
